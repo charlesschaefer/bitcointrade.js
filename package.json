@@ -8,13 +8,13 @@
   "main": "lib/poloniex",
   "dependencies": {
     "nonce": "~1.0.3",
-    "request": "~2.33.0"
+    "request": "~2.88.0"
   },
   "devDependencies": {},
   "scripts": {},
   "repository": {
     "type": "git",
-    "url": "https://github.com/premasagar/poloniex.js.git"
+    "url": "https://github.com/askmike/poloniex.js.git"
   },
   "keywords": [
     "poloniex",
@@ -24,7 +24,7 @@
     "altcoins"
   ],
   "bugs": {
-    "url": "https://github.com/premasagar/poloniex.js/issues"
+    "url": "https://github.com/askmike/poloniex.js/issues"
   },
   "engines": {
     "node": ">=0.10"
