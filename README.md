@@ -1,5 +1,7 @@
 # poloniex.js
 
+**NOTE: Rewritten in ES6 with little deps. see github.com/askmike/poloniex.js**
+
 An (unofficial) Node.js API client for the [Poloniex][poloniex] cryptocurrency exchange.
 
 The client supports both public (unauthenticated) and private (authenticated) calls to the [Poloniex API][poloniex-api].
