@@ -38,7 +38,7 @@ class Poloniex {
     }
 
     if(config.userAgent) {
-      this.ua += ' | ' + ua;
+      this.ua += ' | ' + config.userAgent;
     }
   }
 
@@ -46,7 +46,7 @@ class Poloniex {
     var paramString, signature;
 
     if (!this.key || !this.secret) {
-      throw 'Poloniex: Error. API key and secret required';
+      throw new Error('Poloniex: Error. API key and secret required');
     }
 
     paramString = querystring.stringify(parameters);
