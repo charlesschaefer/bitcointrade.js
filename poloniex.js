@@ -93,10 +93,12 @@ class Poloniex {
           try {
             message = JSON.parse(buffer);
           } catch(e) {
-            message = buffer;
+            message = {
+              error: buffer
+            }
           }
 
-          return callback(new Error('Poloniex error ' + res.statusCode, message));
+          return callback(new Error(`[Poloniex] ${res.statusCode} ${message.error}`));
         }
 
         let json;
