@@ -1,6 +1,6 @@
 {
   "name": "gekko-broker-poloniex",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Poloniex API client",
   "author": "Premasagar Rose <p@premasagar.com>",
   "license": "MIT",
