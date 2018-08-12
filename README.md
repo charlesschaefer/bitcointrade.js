@@ -1,6 +1,16 @@
-# poloniex.js
+# gekko-broker-poloniex
 
-**NOTE: Rewritten in ES6 with little deps. see github.com/askmike/poloniex.js**
+**NOTE**
+
+Forked from: github.com/premasagar/poloniex.js
+
+Rewritten as a ES6 class without any big dependencies (only one: `nonce`). Since keeping the request dep up to date has proved to be too much work. Without it we can keep code lean, fast, small & secure (since we don't need 99% of what request offers).
+
+The API is identical to the original forked one with the exception of the constructor function (pass an object now), see example.
+
+**END NOTE**
+------
+
 
 An (unofficial) Node.js API client for the [Poloniex][poloniex] cryptocurrency exchange.
 
