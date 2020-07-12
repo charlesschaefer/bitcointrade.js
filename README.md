@@ -1,24 +1,24 @@
-# gekko-broker-poloniex
+# Bitcointrade Exchange API
 
 **NOTE**
 
-Forked from: github.com/premasagar/poloniex.js
 
-Rewritten as a ES6 class without any big dependencies (only one: `nonce`). Since keeping the request dep up to date has proved to be too much work. Without it we can keep code lean, fast, small & secure (since we don't need 99% of what request offers).
+Forked from: github.com/askmike/bitcointrade.js that was forked from github.com/premasagar/bitcointrade.js
 
-The API is identical to the original forked one with the exception of the constructor function (pass an object now), see example.
+
+Using the bitcointrade code created by @premasagar and adapted by @askmike.
 
 **END NOTE**
 ------
 
 
-An (unofficial) Node.js API client for the [Poloniex][poloniex] cryptocurrency exchange.
+An (unofficial) Node.js API client for the [Bitcointrade][bitcointrade] cryptocurrency exchange.
 
-The client supports both public (unauthenticated) and private (authenticated) calls to the [Poloniex API][poloniex-api].
+The client supports both public (unauthenticated) and private (authenticated) calls to the [Bitcointrade API][bitcointrade-api].
 
 For private calls, the user secret is never exposed to other parts of the program or over the Web. The user key is sent as a header to the API, along with a signed request.
 
-Repo home: [github.com/premasagar/poloniex.js][repo]
+Repo home: [github.com/charlesschaefer/bitcointrade.js][repo]
 
 
 ## License
@@ -28,13 +28,13 @@ MIT, open source. See LICENSE file.
 
 ## Install via NPM
 
-  npm install poloniex.js
+  npm install bitcointradeapi.js
 
 
 ## Or clone from GitHub
 
-  git clone https://github.com/premasagar/poloniex.js.git
-  cd poloniex
+  git clone https://github.com/charlesschaefer/bitcointrade.js.git
+  cd bitcointrade
   npm install
 
 
@@ -47,39 +47,32 @@ MIT, open source. See LICENSE file.
 
 In your app, require the module:
 
-  var Poloniex = require('poloniex.js');
+  var Bitcointrade = require('bitcointrade.js');
 
-If not installed via NPM, then provide the path to lib/poloniex.js
-
-
-## Temporary certificate workaround
-
-In the past, the API server's certficate was rejected. This was presumably a temporary issue and was reported to Poloniex and fixed. Should the issue come up again, the line below is a temporary workaround. First try using the client without this.
-
-  Poloniex.STRICT_SSL = false;  // this workaround shouldn't be necessary
+If not installed via NPM, then provide the path to bitcointrade.js
 
 
 ## Create an instance of the client
 
 If only public API calls are needed, then no API key or secret is required:
 
-  var poloniex = new Poloniex();
+  var bitcointrade = new Bitcointrade();
 
-Or, to use Poloniex's trading API, [your API key and secret][poloniex-keys] must be provided:
+Or, to use Bitcointrade's trading API, [your API key and secret][bitcointrade-keys] must be provided:
 
-  var poloniex = new Poloniex('API_KEY', 'API_SECRET');
+  var bitcointrade = new Bitcointrade('API_KEY', 'API_SECRET');
 
 
 ## Make API calls
 
-All [Poloniex API][poloniex-api] methods are supported (with some name changes to avoid naming collisions). All methods require a callback function.
+All [Bitcointrade API][bitcointrade-api] methods are supported (with some name changes to avoid naming collisions). All methods require a callback function.
 
 The callback is passed two arguments:
 
 1. An error object, or `null` if the API request was successful
 2. A data object, the response from the API
 
-For the most up-to-date API documentation, see [poloniex.com/api][poloniex-api].
+For the most up-to-date API documentation, see [bitcointrade.com/api][bitcointrade-api].
 
 
 ## Public API methods
@@ -91,7 +84,7 @@ These methods do not require a user key or secret.
 
 Returns the ticker for all markets.
 
-  poloniex.returnTicker(function(err, data) {
+  bitcointrade.returnTicker(function(err, data) {
     if (err){
       // handle error
     }
@@ -109,7 +102,7 @@ Example response:
 
 Returns the 24-hour volume for all markets, plus totals for primary currencies.
 
-  poloniex.return24hVolume(function(err, data) {
+  bitcointrade.return24hVolume(function(err, data) {
     if (err){
       // handle error
     }
@@ -127,7 +120,7 @@ Example response:
 
 Returns the order book for a given market. If currency A is specified as `"all"` and currency B is not specified, then order books for all markets will be returned.
 
-  poloniex.returnOrderBook('VTC', 'BTC', function(err, data) {
+  bitcointrade.returnOrderBook('VTC', 'BTC', function(err, data) {
     if (err){
       // handle error
     }
@@ -173,7 +166,7 @@ These methods require the user key and secret.
 
 Returns all of your balances.
 
-  poloniex.returnBalances(function(err, data) {
+  bitcointrade.returnBalances(function(err, data) {
     if (err){
       // handle error
     }
@@ -229,7 +222,7 @@ Example response:
 
 Returns your open orders for a given market. If currency A is specified as `"all"` and currency B is not specified, then your open orders for all markets will be returned.
 
-  poloniex.returnOpenOrders('VTC', 'BTC', function(err, data){
+  bitcointrade.returnOpenOrders('VTC', 'BTC', function(err, data){
     if (err){
       // handle error
     }
@@ -246,7 +239,7 @@ Example response:
 Returns your trades in a given market within a range, specified by "start" and "end", both of which should be given as UNIX timestamps.
 If no start and end are provided, returns the past 1 hour worth of trades.
 
-  poloniex.returnTradeHistory('VTC', 'BTC', Date.now() / 1000 - 60 * 60, Date.now() / 1000, function(err, data) {
+  bitcointrade.returnTradeHistory('VTC', 'BTC', Date.now() / 1000 - 60 * 60, Date.now() / 1000, function(err, data) {
     if (err) {
       // handle error
     }
@@ -278,7 +271,7 @@ Example response:
 
 Places a limit sell order in a given market.
 
-  poloniex.sell('VTC', 'BTC', 0.1, 100, function(err, data) {
+  bitcointrade.sell('VTC', 'BTC', 0.1, 100, function(err, data) {
     if (err){
       // handle error
     }
@@ -294,7 +287,7 @@ Example response:
 
 Cancels an order you have placed in a given market.
 
-  poloniex.cancelOrder('VTC', 'BTC', 170675, function(err, data) {
+  bitcointrade.cancelOrder('VTC', 'BTC', 170675, function(err, data) {
     if (err){
       // handle error
     }
@@ -318,7 +311,7 @@ Example response:
 
 Immediately places a withdrawal for a given currency, with no email confirmation. In order to use this method, the withdrawal privilege must be enabled for your API key.
 
-  poloniex.withdraw('BTC', 0.01, '17Hzfoobar', function(err, data) {
+  bitcointrade.withdraw('BTC', 0.01, '17Hzfoobar', function(err, data) {
     if (err){
       // handle error
     }
@@ -374,7 +367,7 @@ Example response:
 
 Places a margin buy order in a given market. You may optionally specify a maximum lending rate using the "lendingRate" parameter. If successful, the method will return the order number and any trades immediately resulting from your order.
 
-  poloniex.buy('VTC', 'BTC', 0.1, 100, function(err, data) {
+  bitcointrade.buy('VTC', 'BTC', 0.1, 100, function(err, data) {
     if (err){
       // handle error
     }
@@ -458,8 +451,8 @@ Example response:
 
   {"success":1,"message":0}
 
-[repo]: https://github.com/premasagar/poloniex.js
-[repo-zip]: https://github.com/premasagar/poloniex.js/archive/master.zip
-[poloniex]: https://poloniex.com
-[poloniex-api]: https://poloniex.com/api
-[poloniex-keys]: https://poloniex.com/apiKeys
+[repo]: https://github.com/premasagar/bitcointrade.js
+[repo-zip]: https://github.com/premasagar/bitcointrade.js/archive/master.zip
+[bitcointrade]: https://bitcointrade.com
+[bitcointrade-api]: https://bitcointrade.com/api
+[bitcointrade-keys]: https://bitcointrade.com/apiKeys
