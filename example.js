@@ -2,7 +2,7 @@ const Bitcointrade = require('./bitcointrade');
 
 const p = new Bitcointrade();
 
-p.returnTicker(console.log);
+p.ticker('BRLBTC', console.log);
 
 
 // fil in keys and uncommetn

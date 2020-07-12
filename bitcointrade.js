@@ -61,10 +61,10 @@ class Bitcointrade {
 
   _request({url, qs, method, data, headers = {}}, callback) {
 
-    const path = url + '?' + querystring.stringify(qs);
+    const path = '/v3' + url + '?' + querystring.stringify(qs);
 
     const options = {
-      host: 'poloniex.com',
+      host: 'api.bitcointrade.com.br',
       path,
       method,
       headers: {
@@ -77,7 +77,8 @@ class Bitcointrade {
 
     if(method === 'POST') {
       options.headers['Content-Length'] = rawData.length;
-      options.headers['content-type'] = 'application/x-www-form-urlencoded';
+      // options.headers['content-type'] = 'application/x-www-form-urlencoded';
+      options.headers['content-type'] = 'application/json';
     }
 
     const req = https.request(options, res => {
@@ -126,7 +127,7 @@ class Bitcointrade {
   }
 
   // Make a public API request
-  _public(command, parameters, callback) {
+  _public(coin, command, parameters, callback) {
     if (typeof parameters === 'function') {
       callback = parameters;
       parameters = {};
@@ -136,12 +137,11 @@ class Bitcointrade {
       parameters = {};
     }
 
-    parameters.command = command;
+    // parameters.command = command;
 
     return this._request({
-      url: '/public',
+      url: ['/public', coin, command].join('/'),
       qs: parameters,
-      command,
       method: 'GET'
     }, callback);
   }
@@ -167,12 +167,22 @@ class Bitcointrade {
     }, callback);
   }
 
-  returnTicker(callback) {
-    return this._public('returnTicker', callback);
+  ticker(coin, callback) {
+    return this._public(coin, 'ticker', callback);
   }
 
-  return24hVolume(callback) {
-    return this._public('return24hVolume', callback);
+  orders(coin, limit, callback) {
+    return this._public(coin, 'orders', {limit: limit}, callback);
+  }
+
+  trades(coin, start, end, page_size, current_page, callback) {
+    let parameters = {
+      start_time: start,
+      end_time: end,
+      page_size: page_size,
+      current_page: current_page
+    };
+    return this._public(coin, 'trades', parameters, callback);
   }
 
   returnOrderBook(currencyA, currencyB, callback) {
