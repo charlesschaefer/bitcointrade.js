@@ -28,9 +28,8 @@ class Bitcointrade {
       return;
     }
 
-    if(config.key && config.secret) {
+    if(config.key) {
       this.key = config.key;
-      this.secret = config.secret;
     }
 
     if(config.timeout) {
@@ -42,20 +41,13 @@ class Bitcointrade {
     }
   }
 
-  _getPrivateHeaders(parameters) {
-    var paramString, signature;
-
-    if (!this.key || !this.secret) {
-      throw new Error('Bitcointrade: Error. API key and secret required');
+  _getPrivateHeaders() {
+    if (!this.key) {
+      throw new Error('Bitcointrade: Error. API key required');
     }
 
-    paramString = querystring.stringify(parameters);
-
-    signature = crypto.createHmac('sha512', this.secret).update(paramString).digest('hex');
-
     return {
-      Key: this.key,
-      Sign: signature
+      'x-api-key': this.key
     };
   }
 
@@ -80,7 +72,7 @@ class Bitcointrade {
       // options.headers['content-type'] = 'application/x-www-form-urlencoded';
       options.headers['content-type'] = 'application/json';
     }
-
+console.log("[Bitcointrade] Calling ", path, " with options: ", options);
     const req = https.request(options, res => {
       res.setEncoding('utf8');
       let buffer = '';
@@ -203,8 +195,8 @@ class Bitcointrade {
   /////
   // PRIVATE METHODS
 
-  walletBalances(callback) {
-    return this._private('wallets/ballances', {}, callback);
+  walletBalance(callback) {
+    return this._private('wallets/balance', {}, callback);
   }
 
   returnCompleteBalances(account, callback) {
