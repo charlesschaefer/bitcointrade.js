@@ -18,6 +18,16 @@ const joinCurrencies = (currencyA, currencyB) => {
   return currencyA + '_' + currencyB;
 }
 
+const currency_names = {
+  'BTC' => 'bitcoin',
+  'XRP' => 'ripple',
+  'LTC' => 'litecoin',
+  'ETH' => 'ethereum',
+  'BCH' => 'bitcoincash',
+  'EOS' => 'eos',
+  'DAI' => 'dai'
+};
+
 class Bitcointrade {
   constructor(config) {
     this.ua = USER_AGENT;
@@ -149,17 +159,17 @@ class Bitcointrade {
       parameters = {};
     }
 
-    var method = 'GET';
+    let method = 'GET';
     if (parameters.method) {
       method = parameters.method;
     }
 
-    var data;
+    let data;
     if (parameters.data) {
       data = parameters.data;
     }
 
-    var request_params = {
+    let request_params = {
       url: '/' + command,
       headers: this._getPrivateHeaders(parameters),
       method: method
@@ -199,8 +209,49 @@ class Bitcointrade {
     return this._private('wallets/balance', {}, callback);
   }
 
-  buy(pair, price, amount, subtype, callback) {
+  summary(pair, callback) {
+    let data = {
+      pair = pair
+    };
+
+    return this._private('market/summary', {data: data}, callback);
+  }
+
+  estimatedPrice(pair, amount, type, callback) {
     var data = {
+      amount: amount,
+      type: type,
+      pair: pair
+    };
+
+    return this._private('market/estimated_price', {data: data}, callback);
+  }
+
+  bookOrders(pair, limit, callback) {
+    let data {
+      pair: pair,
+      limit: limit
+    };
+
+    return this._private('market', {data: data}, callback);
+  }
+
+  userOrders(pair, start, end, type, status, page_size, current_page, callback) {
+    let data = {
+      pair: pair,
+      start_date: start,
+      end_date: end,
+      type: type,
+      status: status,
+      page_size: page_size,
+      current_page: current_page
+    };
+
+    return this._private('market/user_orders/list', {data: data}, callback);
+  }
+
+  buy(pair, price, amount, subtype, callback) {
+    let data = {
       pair: pair,
       type: 'buy',
       unit_price: price,
@@ -208,11 +259,11 @@ class Bitcointrade {
       subtype: subtype
     };
 
-    return this._private('market/create_order', {data: data}, callback);
+    return this._private('market/create_order', {data: data, method: 'POST'}, callback);
   }
 
   sell(pair, price, amount, subtype, callback) {
-    var data = {
+    let data = {
       pair: pair,
       type: 'sell',
       unit_price: price,
@@ -220,204 +271,59 @@ class Bitcointrade {
       subtype: subtype
     };
 
-    return this._private('market/create_order', {data: data}, callback);
+    return this._private('market/create_order', {data: data, method: 'POST'}, callback);
   }
 
-  returnDepositsWithdrawals(start, end, callback) {
-    return this._private('returnDepositsWithdrawals', {start: start, end: end}, callback);
-  }
-
-  // can be called with `returnOpenOrders('all', callback)`
-  returnOpenOrders(currencyA, currencyB, callback) {
-    var currencyPair;
-
-    if (typeof currencyB === 'function') {
-      currencyPair = currencyA;
-      callback = currencyB;
-      currencyB = null;
+  cancelOrder(orderId, orderCode, callback) {
+    let data = {};
+    if (orderId) {
+      data.id = orderId;
+    } else if (orderCode) {
+      data.code = orderCode;
     }
 
-    else {
-      currencyPair = joinCurrencies(currencyA, currencyB);
-    }
-
-    var parameters = {
-      currencyPair: currencyPair
-    };
-
-    return this._private('returnOpenOrders', parameters, callback);
+    return this._private('market/user_orders', {data: data, method: 'DELETE'}, callback);
   }
 
-  returnTradeHistory(currencyA, currencyB, start, end, callback) {
-    if(arguments.length < 5){
-      callback = start;
-      start = Date.now() / 1000 - 60 * 60;
-      end = Date.now() / 1000 + 60 * 60; // Some buffer in case of client/server time out of sync.
-    }
+  withdrawFeeEstimate(currency, callback) {
+    let currency_name = currency_names[currency];
 
-    var parameters = {
-      currencyPair: joinCurrencies(currencyA, currencyB),
-      start: start,
-      end: end
-    };
-
-    return this._private('returnTradeHistory', parameters, callback);
+    return this._private(currency_name + '/withdraw/fee', {}, callback);
   }
 
-  returnOrderTrades(orderNumber, callback) {
-    var parameters = {
-      orderNumber: orderNumber
+  depositList(currency, status, start, end, page_size, current_page, callback) {
+    let data = {
+      status: status,
+      start_date: start,
+      end_date: end,
+      page_size: page_size,
+      current_page: current_page
     };
 
-    return this._private('returnOrderTrades', parameters, callback);
+    let currency_name = currency_names[currency];
+
+    return this._private(currency_name + '/deposits', {data: data}, callback);
   }
 
+  createWithdraw(currency, destination, fee_type, amount, tag, callback) {
+    let currency_name = currency_names[currency];
 
-
-  cancelOrder(currencyA, currencyB, orderNumber, callback) {
-    var parameters = {
-      currencyPair: joinCurrencies(currencyA, currencyB),
-      orderNumber: orderNumber
-    };
-
-    return this._private('cancelOrder', parameters, callback);
-  }
-
-  moveOrder(orderNumber, rate, amount, callback) {
-    var parameters = {
-      orderNumber: orderNumber,
-      rate: rate,
-      amount: amount ? amount : null
-    };
-
-    return this._private('moveOrder', parameters, callback);
-  }
-
-  withdraw(currency, amount, address, callback) {
-    var parameters = {
-      currency: currency,
+    let data = {
+      destination: destination,
+      fee_type: fee_type,
       amount: amount,
-      address: address
+      tag: tag
     };
 
-    return this._private('withdraw', parameters, callback);
+    return this._private(currency_name + '/withdraw', {data: data, method: "POST"}, callback);
   }
 
-  returnFeeInfo(callback) {
-    return this._private('returnFeeInfo', {}, callback);
-  }
-
-  returnAvailableAccountBalances(account, callback) {
-    var parameters = {};
-
-    if (typeof account === 'function') {
-      callback = account;
-    }
-
-    else if (typeof account === 'string' && !!account) {
-      parameters.account = account;
-    }
-
-    return this._private('returnAvailableAccountBalances', parameters, callback);
-  }
-
-  returnTradableBalances(callback) {
-    return this._private('returnTradableBalances', {}, callback);
-  }
-
-  transferBalance(currency, amount, fromAccount, toAccount, callback) {
-    var parameters = {
-      currency: currency,
-      amount: amount,
-      fromAccount: fromAccount,
-      toAccount: toAccount
+  syncTransaction(hash, callback) {
+    let data = {
+      hash: hash
     };
 
-    return this._private('transferBalance', parameters, callback);
-  }
-
-  returnMarginAccountSummary(callback) {
-    return this._private('returnMarginAccountSummary', {}, callback);
-  }
-
-  marginBuy(currencyA, currencyB, rate, amount, lendingRate, callback) {
-    var parameters = {
-      currencyPair: joinCurrencies(currencyA, currencyB),
-      rate: rate,
-      amount: amount,
-      lendingRate: lendingRate ? lendingRate : null
-    };
-
-    return this._private('marginBuy', parameters, callback);
-  }
-
-  marginSell(currencyA, currencyB, rate, amount, lendingRate, callback) {
-    var parameters = {
-      currencyPair: joinCurrencies(currencyA, currencyB),
-      rate: rate,
-      amount: amount,
-      lendingRate: lendingRate ? lendingRate : null
-    };
-
-    return this._private('marginSell', parameters, callback);
-  }
-
-  getMarginPosition(currencyA, currencyB, callback) {
-    var parameters = {
-      currencyPair: joinCurrencies(currencyA, currencyB)
-    };
-
-    return this._private('getMarginPosition', parameters, callback);
-  }
-
-  closeMarginPosition(currencyA, currencyB, callback) {
-    var parameters = {
-      currencyPair: joinCurrencies(currencyA, currencyB)
-    };
-
-    return this._private('closeMarginPosition', parameters, callback);
-  }
-
-  createLoanOffer(currency, amount, duration, autoRenew, lendingRate, callback) {
-    var parameters = {
-      currency: currency,
-      amount: amount,
-      duration: duration,
-      autoRenew: autoRenew,
-      lendingRate: lendingRate
-    };
-
-    return this._private('createLoanOffer', parameters, callback);
-  }
-
-  cancelLoanOffer(orderNumber, callback) {
-    var parameters = {
-      orderNumber: orderNumber
-    };
-
-    return this._private('cancelLoanOffer', parameters, callback);
-  }
-
-  returnOpenLoanOffers(callback) {
-    return this._private('returnOpenLoanOffers', {}, callback);
-  }
-
-  returnActiveLoans(callback) {
-    return this._private('returnActiveLoans', {}, callback);
-  }
-
-  returnLendingHistory(start, end, limit, callback) {
-    var parameters = {
-      start: start,
-      end: end,
-      limit: limit
-    };
-
-    return this._private('returnLendingHistory', parameters, callback);
-  }
-
-  toggleAutoRenew(orderNumber, callback) {
-    return this._private('toggleAutoRenew', {orderNumber: orderNumber}, callback);
+    return this._private('ripple/sync_transaction', {data: data, method: "POST"}, callback);
   }
 
 };
