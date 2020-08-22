@@ -138,7 +138,6 @@ class Bitcointrade {
     }
 
     // parameters.command = command;
-
     return this._request({
       url: ['/public', coin, command].join('/'),
       qs: parameters,
@@ -146,25 +145,41 @@ class Bitcointrade {
     }, callback);
   }
 
-
   // Make a private API request
   _private(command, parameters, callback) {
-    var options;
 
     if (typeof parameters === 'function') {
       callback = parameters;
       parameters = {};
     }
 
-    parameters.command = command;
-    parameters.nonce = this.noncer();
+    if(!parameters) {
+      parameters = {};
+    }
 
-    return this._request({
-      method: 'POST',
-      url: '/tradingApi',
+    var method = 'GET';
+    if (parameters.method) {
+      method = parameters.method;
+    }
+
+    var data;
+    if (parameters.data) {
+      data = parameters.data;
+    }
+
+    var request_params = {
+      url: '/' + command,
       headers: this._getPrivateHeaders(parameters),
-      data: parameters
-    }, callback);
+      method: method
+    };
+
+    if (method == 'GET') {
+      request_params.qs = data;
+    } else {
+      request_params.data = data;
+    }
+
+    return this._request(request_params, callback);
   }
 
   ticker(coin, callback) {
@@ -185,50 +200,11 @@ class Bitcointrade {
     return this._public(coin, 'trades', parameters, callback);
   }
 
-  returnOrderBook(currencyA, currencyB, callback) {
-    var currencyPair;
-
-    if (typeof currencyB === 'function') {
-      currencyPair = currencyA;
-      callback = currencyB;
-      currencyB = null;
-    }
-
-    else {
-      currencyPair = joinCurrencies(currencyA, currencyB);
-    }
-
-    var parameters = {
-      currencyPair: currencyPair
-    };
-
-    return this._public('returnOrderBook', parameters, callback);
-  }
-
-  returnChartData(currencyA, currencyB, period, start, end, callback) {
-    var parameters = {
-      currencyPair: joinCurrencies(currencyA, currencyB),
-      period: period,
-      start: start,
-      end: end
-    };
-
-    return this._public('returnChartData', parameters, callback);
-  }
-
-  returnCurrencies(callback) {
-    return this._public('returnCurrencies', callback);
-  }
-
-  returnLoanOrders(currency, callback) {
-    return this._public('returnLoanOrders', {currency: currency}, callback);
-  }
-
   /////
   // PRIVATE METHODS
 
-  returnBalances(callback) {
-    return this._private('returnBalances', {}, callback);
+  walletBalances(callback) {
+    return this._private('wallets/ballances', {}, callback);
   }
 
   returnCompleteBalances(account, callback) {
@@ -241,7 +217,7 @@ class Bitcointrade {
     else if (typeof account === 'string' && !!account) {
       parameters.account = account;
     }
-    
+
     return this._private('returnCompleteBalances', parameters, callback);
   }
 
@@ -365,7 +341,7 @@ class Bitcointrade {
     else if (typeof account === 'string' && !!account) {
       parameters.account = account;
     }
-    
+
     return this._private('returnAvailableAccountBalances', parameters, callback);
   }
 
