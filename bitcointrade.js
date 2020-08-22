@@ -72,7 +72,7 @@ class Bitcointrade {
       // options.headers['content-type'] = 'application/x-www-form-urlencoded';
       options.headers['content-type'] = 'application/json';
     }
-console.log("[Bitcointrade] Calling ", path, " with options: ", options);
+    console.log("[Bitcointrade] Calling ", path, " with options: ", options);
     const req = https.request(options, res => {
       res.setEncoding('utf8');
       let buffer = '';
@@ -119,7 +119,7 @@ console.log("[Bitcointrade] Calling ", path, " with options: ", options);
   }
 
   // Make a public API request
-  _public(coin, command, parameters, callback) {
+  _public(pair, command, parameters, callback) {
     if (typeof parameters === 'function') {
       callback = parameters;
       parameters = {};
@@ -131,7 +131,7 @@ console.log("[Bitcointrade] Calling ", path, " with options: ", options);
 
     // parameters.command = command;
     return this._request({
-      url: ['/public', coin, command].join('/'),
+      url: ['/public', pair, command].join('/'),
       qs: parameters,
       method: 'GET'
     }, callback);
@@ -174,22 +174,22 @@ console.log("[Bitcointrade] Calling ", path, " with options: ", options);
     return this._request(request_params, callback);
   }
 
-  ticker(coin, callback) {
-    return this._public(coin, 'ticker', callback);
+  ticker(pair, callback) {
+    return this._public(pair, 'ticker', callback);
   }
 
-  orders(coin, limit, callback) {
-    return this._public(coin, 'orders', {limit: limit}, callback);
+  orders(pair, limit, callback) {
+    return this._public(pair, 'orders', {limit: limit}, callback);
   }
 
-  trades(coin, start, end, page_size, current_page, callback) {
+  trades(pair, start, end, page_size, current_page, callback) {
     let parameters = {
       start_time: start,
       end_time: end,
       page_size: page_size,
       current_page: current_page
     };
-    return this._public(coin, 'trades', parameters, callback);
+    return this._public(pair, 'trades', parameters, callback);
   }
 
   /////
@@ -199,26 +199,28 @@ console.log("[Bitcointrade] Calling ", path, " with options: ", options);
     return this._private('wallets/balance', {}, callback);
   }
 
-  returnCompleteBalances(account, callback) {
-    var parameters = {};
+  buy(pair, price, amount, subtype, callback) {
+    var data = {
+      pair: pair,
+      type: 'buy',
+      unit_price: price,
+      amount: amount,
+      subtype: subtype
+    };
 
-    if (typeof account === 'function') {
-      callback = account;
-    }
-
-    else if (typeof account === 'string' && !!account) {
-      parameters.account = account;
-    }
-
-    return this._private('returnCompleteBalances', parameters, callback);
+    return this._private('market/create_order', {data: data}, callback);
   }
 
-  returnDepositAddresses(callback) {
-    return this._private('returnDepositAddresses', {}, callback);
-  }
+  sell(pair, price, amount, subtype, callback) {
+    var data = {
+      pair: pair,
+      type: 'sell',
+      unit_price: price,
+      amount: amount,
+      subtype: subtype
+    };
 
-  generateNewAddress(currency, callback) {
-    return this._private('generateNewAddress', {currency: currency}, callback);
+    return this._private('market/create_order', {data: data}, callback);
   }
 
   returnDepositsWithdrawals(start, end, callback) {
@@ -270,25 +272,7 @@ console.log("[Bitcointrade] Calling ", path, " with options: ", options);
     return this._private('returnOrderTrades', parameters, callback);
   }
 
-  buy(currencyA, currencyB, rate, amount, callback) {
-    var parameters = {
-      currencyPair: joinCurrencies(currencyA, currencyB),
-      rate: rate,
-      amount: amount
-    };
 
-    return this._private('buy', parameters, callback);
-  }
-
-  sell(currencyA, currencyB, rate, amount, callback) {
-    var parameters = {
-      currencyPair: joinCurrencies(currencyA, currencyB),
-      rate: rate,
-      amount: amount
-    };
-
-    return this._private('sell', parameters, callback);
-  }
 
   cancelOrder(currencyA, currencyB, orderNumber, callback) {
     var parameters = {
