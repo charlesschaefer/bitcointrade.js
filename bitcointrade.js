@@ -19,13 +19,13 @@ const joinCurrencies = (currencyA, currencyB) => {
 }
 
 const currency_names = {
-  'BTC' => 'bitcoin',
-  'XRP' => 'ripple',
-  'LTC' => 'litecoin',
-  'ETH' => 'ethereum',
-  'BCH' => 'bitcoincash',
-  'EOS' => 'eos',
-  'DAI' => 'dai'
+  'BTC': 'bitcoin',
+  'XRP': 'ripple',
+  'LTC': 'litecoin',
+  'ETH': 'ethereum',
+  'BCH': 'bitcoincash',
+  'EOS': 'eos',
+  'DAI': 'dai'
 };
 
 class Bitcointrade {
@@ -211,7 +211,7 @@ class Bitcointrade {
 
   summary(pair, callback) {
     let data = {
-      pair = pair
+      pair: pair
     };
 
     return this._private('market/summary', {data: data}, callback);
@@ -228,7 +228,7 @@ class Bitcointrade {
   }
 
   bookOrders(pair, limit, callback) {
-    let data {
+    let data = {
       pair: pair,
       limit: limit
     };
